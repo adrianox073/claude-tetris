@@ -289,13 +289,14 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
-// Dibuja solo la porción de una tuerca hexagonal (3×3 celdas) que cae en la celda (x, y).
-// `part` (0–8) indica qué celda del 3×3 es, para situar la tuerca completa.
+// Dibuja solo la porción de la tuerca (marco cuadrado 3×3 con hueco cuadrado en
+// el centro) que cae en la celda (x, y). `part` (0–8) indica qué celda del 3×3
+// es, para situar la tuerca completa.
 function drawNutSlice(context, x, y, part, size, alpha) {
   const cx = (x - (part % 3)) * size + 1.5 * size;
   const cy = (y - Math.floor(part / 3)) * size + 1.5 * size;
-  const R = 1.45 * size;
-  const hole = 0.72 * size;
+  const R = 1.5 * size - 1;    // mitad del lado exterior (3 celdas)
+  const hole = 0.5 * size + 1; // mitad del lado del hueco (celda central)
   context.save();
   context.globalAlpha = alpha ?? 1;
   context.beginPath();
@@ -303,15 +304,8 @@ function drawNutSlice(context, x, y, part, size, alpha) {
   context.clip();
 
   context.beginPath();
-  for (let i = 0; i < 6; i++) {
-    const a = Math.PI / 3 * i;
-    const px = cx + R * Math.cos(a);
-    const py = cy + R * Math.sin(a);
-    if (i === 0) context.moveTo(px, py); else context.lineTo(px, py);
-  }
-  context.closePath();
-  context.moveTo(cx + hole, cy);
-  context.arc(cx, cy, hole, 0, Math.PI * 2);
+  context.rect(cx - R, cy - R, 2 * R, 2 * R);
+  context.rect(cx - hole, cy - hole, 2 * hole, 2 * hole);
 
   const grad = context.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
   grad.addColorStop(0, '#eceff1');
